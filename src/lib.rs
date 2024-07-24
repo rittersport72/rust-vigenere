@@ -15,7 +15,7 @@ impl Vigenere {
     pub fn new(key: &str) -> Self {
         // Create vectors for alphabet and for key
         let alphabet_characters = ALPHABET_ASCII.chars().collect();
-        let key_characters = Self::character_filter(&alphabet_characters, key);
+        let key_characters = Self::filter_characters(&alphabet_characters, key);
         let shifted_alphabet = Self::shift_alphabet(&alphabet_characters, &key_characters);
 
         Vigenere {
@@ -26,30 +26,44 @@ impl Vigenere {
     }
 
     pub fn encrypt(&self, text: &str) -> String {
-        let text_characters = Self::character_filter(&self.alphabet, text);
-        let text_length = text_characters.len();
-        let enlarged_key = self.enlarge_key(text_length);
+        let text_characters = Self::filter_characters(&self.alphabet, text);
+        let enlarged_key = self.enlarge_key(text.len());
+        // Encrypted vector
+        let mut vec: Vec<char> = Vec::new();
 
-        println!("key {:?}", enlarged_key);
-        println!("shifted_alphabet {:?}", self.shifted_alphabet.len());
-        // TODO encrypt
+        // Iterate over text characters
+        for (pos, c) in text_characters.iter().enumerate() {
+            // Get for character the index in alphabet
+            let index = self.alphabet.iter().position(|&x| x.eq(&c));
 
-        "".to_owned()
+            // Get key at character position
+            let key = enlarged_key.get(pos);
+            // Get shifted alphabet for key
+            let found = self.shifted_alphabet.get(&key.unwrap());
+
+            // Check valid alphabet
+            if found.is_some() && index.is_some(){
+                let alphabet_for_key= found.unwrap();
+                let encrypted = alphabet_for_key.get(index.unwrap());
+                vec.push(encrypted.unwrap().to_owned());
+            }
+        }
+
+        let s: String = vec.into_iter().collect();
+        s
     }
 
     pub fn decrypt(&self, text: &str) -> String {
-        let text_characters = Self::character_filter(&self.alphabet, text);
-        let text_length = text_characters.len();
-        let enlarged_key = self.enlarge_key(text_length);
+        let text_characters = Self::filter_characters(&self.alphabet, text);
+        let enlarged_key = self.enlarge_key(text.len());
+        // Decrypted vector
+        let mut vec: Vec<char> = Vec::new();
+        let s: String = vec.into_iter().collect();
 
-        println!("key {:?}", enlarged_key);
-        println!("shifted_alphabet {:?}", self.shifted_alphabet.len());
-        // TODO decrypt
-
-        "".to_owned()
+        s
     }
 
-    fn character_filter(alphabet: &Vec<char>, text: &str) -> Vec<char> {
+    fn filter_characters(alphabet: &Vec<char>, text: &str) -> Vec<char> {
         let mut vec = Vec::new();
 
         for c in text.chars() {
@@ -109,7 +123,7 @@ mod tests {
 
         let text = "one for all, all for one.";
         let encrypted = vigenere.encrypt(text);
-        assert_eq!(encrypted, "");
+        assert_eq!(encrypted, "jvkjbvrpgirpssisim");
     }
 
     #[test]
