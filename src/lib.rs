@@ -1,10 +1,6 @@
 use std::collections::HashMap;
 
-// Greek alphabet
-pub const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
-// ASCII alphabet
-pub const ALPHABET_ASCII: &'static str = "abcdefghijklmnopqrstuvwxyz";
-
+// Vigenere chiffre with UTF-8 characters
 pub struct Vigenere {
     alphabet: Vec<char>,
     key: Vec<char>,
@@ -12,9 +8,14 @@ pub struct Vigenere {
 }
 
 impl Vigenere {
-    pub fn new(key: &str) -> Self {
+    pub fn new(key: &str, alphabet: Option<&str>) -> Self {
+        let alphabet_characters;
+        if alphabet.is_some() {
+            alphabet_characters = alphabet.unwrap().chars().collect();
+        } else {
+            alphabet_characters = Self::ALPHABET_ASCII.chars().collect();
+        }
         // Create vectors for alphabet and for key
-        let alphabet_characters = ALPHABET_ASCII.chars().collect();
         let key_characters = Self::filter_characters(&alphabet_characters, key);
         let shifted_alphabet = Self::shift_alphabet(&alphabet_characters, &key_characters);
 
@@ -110,6 +111,9 @@ impl Vigenere {
         }
         shifted_alphabet
     }
+
+    // ASCII alphabet
+    pub const ALPHABET_ASCII: &'static str = "abcdefghijklmnopqrstuvwxyz";
 }
 
 #[cfg(test)]
@@ -119,7 +123,8 @@ mod tests {
     #[test]
     fn check_encrypt() {
         let key = "vigenere";
-        let vigenere = Vigenere::new(key);
+        // Create vigenere with ASCII alphabet
+        let vigenere = Vigenere::new(key, None);
 
         let text = "one for all, all for one.";
         let encrypted = vigenere.encrypt(text);
@@ -129,10 +134,26 @@ mod tests {
     #[test]
     fn check_decrypt() {
         let key = "vigenere";
-        let vigenere = Vigenere::new(key);
+        // Create vigenere with ASCII alphabet
+        let vigenere = Vigenere::new(key, None);
 
         let text = "one for all, all for one.";
         let decrypted = vigenere.decrypt("blablabla");
         assert_eq!(decrypted, "");
+    }
+
+    #[test]
+    fn check_alphabet() {
+        let key = "ολυμπια"; // olympia
+        // Create vigenere with greek alphabet
+        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
+
+        let vigenere = Vigenere::new(key, Some(ALPHABET_GREEK));
+
+        let alphabet_vec: Vec<char> = ALPHABET_GREEK.chars().collect();
+        assert_eq!(alphabet_vec, vigenere.alphabet);
+
+        let key_vec: Vec<char> = key.chars().collect();
+        assert_eq!(key_vec, vigenere.key);
     }
 }
