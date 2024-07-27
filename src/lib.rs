@@ -34,17 +34,17 @@ impl Vigenere {
 
         // Iterate over text characters
         for (pos, c) in text_characters.iter().enumerate() {
-            // Get for character the index in alphabet
-            let index = self.alphabet.iter().position(|&x| x.eq(&c));
-
             // Get key at character position
             let key = enlarged_key.get(pos);
             // Get shifted alphabet for key
             let found = self.shifted_alphabet.get(&key.unwrap());
 
+            // Get for character the index in alphabet
+            let index = self.alphabet.iter().position(|&x| x.eq(&c));
+
             // Check valid alphabet
-            if found.is_some() && index.is_some(){
-                let alphabet_for_key= found.unwrap();
+            if found.is_some() && index.is_some() {
+                let alphabet_for_key = found.unwrap();
                 let encrypted = alphabet_for_key.get(index.unwrap());
                 vec.push(encrypted.unwrap().to_owned());
             }
@@ -59,8 +59,27 @@ impl Vigenere {
         let enlarged_key = self.enlarge_key(text.len());
         // Decrypted vector
         let mut vec: Vec<char> = Vec::new();
-        let s: String = vec.into_iter().collect();
 
+        // Iterate over text characters
+        for (pos, c) in text_characters.iter().enumerate() {
+            // Get key at character position
+            let key = enlarged_key.get(pos);
+            // Get shifted alphabet for key
+            let found = self.shifted_alphabet.get(&key.unwrap());
+
+            // Check valid alphabet
+            if found.is_some() {
+                let alphabet_for_key = found.unwrap();
+
+                // Get for character the index in shifted alphabet
+                let index = alphabet_for_key.iter().position(|&x| x.eq(&c));
+
+                let decrypted = self.alphabet.get(index.unwrap());
+                vec.push(decrypted.unwrap().to_owned());
+            }
+        }
+
+        let s: String = vec.into_iter().collect();
         s
     }
 
@@ -105,7 +124,7 @@ impl Vigenere {
             shift_vec.append(&mut split.1.to_vec());
             shift_vec.append(&mut split.0.to_vec());
 
-            println!("shifted {:?}", shift_vec);
+            //println!("shifted {:?}", shift_vec);
 
             shifted_alphabet.insert(c, shift_vec);
         }
@@ -137,15 +156,15 @@ mod tests {
         // Create vigenere with ASCII alphabet
         let vigenere = Vigenere::new(key, None);
 
-        let text = "one for all, all for one.";
-        let decrypted = vigenere.decrypt("blablabla");
-        assert_eq!(decrypted, "");
+        let text = "oneforallallforone";
+        let decrypted = vigenere.decrypt("jvkjbvrpgirpssisim");
+        assert_eq!(decrypted, text);
     }
 
     #[test]
     fn check_alphabet() {
         let key = "ολυμπια"; // olympia
-        // Create vigenere with greek alphabet
+                             // Create vigenere with greek alphabet
         const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
 
         let vigenere = Vigenere::new(key, Some(ALPHABET_GREEK));
@@ -155,5 +174,20 @@ mod tests {
 
         let key_vec: Vec<char> = key.chars().collect();
         assert_eq!(key_vec, vigenere.key);
+    }
+
+    #[test]
+    fn check_encrypt_decrypt() {
+        let key = "ολυμπια"; // olympia
+        // Create vigenere with greek alphabet
+        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
+
+        let vigenere = Vigenere::new(key, Some(ALPHABET_GREEK));
+
+        let text = "μεσανυχτα"; // midnight
+        let encrypted = vigenere.encrypt(text);
+        let decrypted = vigenere.decrypt(&encrypted);
+
+        assert_eq!(decrypted, text);
     }
 }
