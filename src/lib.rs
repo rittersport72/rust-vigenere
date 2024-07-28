@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 // Vigenere chiffre with UTF-8 characters
+#[derive(Debug, PartialEq, Clone)]
 pub struct Vigenere {
     alphabet: Vec<char>,
     key: Vec<char>,
@@ -164,9 +165,9 @@ mod tests {
     #[test]
     fn check_alphabet() {
         let key = "ολυμπια"; // olympia
-                             // Create vigenere with greek alphabet
-        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
 
+        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
+        // Create vigenere with greek alphabet
         let vigenere = Vigenere::new(key, Some(ALPHABET_GREEK));
 
         let alphabet_vec: Vec<char> = ALPHABET_GREEK.chars().collect();
@@ -179,9 +180,9 @@ mod tests {
     #[test]
     fn check_encrypt_decrypt() {
         let key = "ολυμπια"; // olympia
-        // Create vigenere with greek alphabet
-        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
 
+        const ALPHABET_GREEK: &'static str = "αβγδεζηθικλμνξοπρστυφχψω";
+        // Create vigenere with greek alphabet
         let vigenere = Vigenere::new(key, Some(ALPHABET_GREEK));
 
         let text = "μεσανυχτα"; // midnight

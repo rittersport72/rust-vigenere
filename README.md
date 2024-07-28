@@ -1,5 +1,5 @@
 # rust-vigenere
-Library for encrypting and decrypting a text with the Vigenère chiffre.  
+Library for encryption and decryption with the Vigenère chiffre.  
 This library is operating on UTF-8 characters and therefore works with greek or japanese letters.
 
 ## Usage
